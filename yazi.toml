@@ -1,0 +1,222 @@
+# Yazi 配置文件
+# 文档: https://yazi-rs.github.io/docs/configuration/yazi
+
+# ============================================================
+# 文件管理器核心设置
+# ============================================================
+[mgr]
+# 三栏布局比例 [父目录, 当前目录, 预览]
+ratio = [1, 4, 3]
+
+# 排序
+sort_by = "natural"          # 自然排序 (1, 2, 10 而非 1, 10, 2)
+sort_sensitive = false       # 不区分大小写
+sort_reverse = false         # 正序
+sort_dir_first = true        # 目录优先
+sort_translit = false
+
+# 显示
+linemode = "none"            # 右侧不显示额外信息 (可选: size/mtime/permissions)
+show_hidden = false          # 不显示隐藏文件 (按 . 键切换)
+show_symlink = true          # 显示符号链接目标
+
+# 交互（从 lf 迁移：scrolloff = 10）
+scrolloff = 10               # 光标距边缘保持 10 行（与 lf 一致）
+mouse_events = []  # 禁用鼠标（允许终端选择文本）
+title_format = "Yazi: {cwd}" # 终端标题格式
+
+# ============================================================
+# 预览设置
+# ============================================================
+[preview]
+# 代码预览
+wrap = "no"                  # 不自动换行
+tab_size = 2                 # Tab = 2 空格
+
+# 图片预览
+max_width = 600              # 最大宽度 (像素)
+max_height = 900             # 最大高度 (像素)
+image_filter = "triangle"    # 缩放算法: nearest/triangle/catmull-rom/lanczos3
+image_quality = 75           # 缓存质量 (50-90)
+image_delay = 30             # 预览延迟 (毫秒)
+
+cache_dir = ""               # 缓存目录 (空 = 系统临时目录)
+
+# ============================================================
+# 文件打开器
+# ============================================================
+[opener]
+# 编辑器
+edit = [
+	{ run = '${EDITOR:-vi} "$@"', desc = "$EDITOR", block = true, for = "unix" },
+]
+
+# 默认打开
+open = [
+	{ run = 'xdg-open "$1"', desc = "Open", for = "linux" },
+	{ run = 'open "$@"', desc = "Open", for = "macos" },
+]
+
+# 在文件管理器中显示
+reveal = [
+	{ run = 'xdg-open "$(dirname "$1")"', desc = "Reveal", for = "linux" },
+]
+
+# 播放器
+play = [
+	{ run = 'mpv --force-window "$@"', orphan = true, for = "unix" },
+]
+
+# 解压（使用 ouch）
+extract = [
+	{ run = 'ouch d -y "$@"', desc = "Extract here with ouch", for = "unix" },
+]
+
+# ============================================================
+# 文件类型规则
+# ============================================================
+[open]
+prepend_rules = [
+	# 压缩文件使用 extract
+	{ mime = "application/zip", use = "extract" },
+	{ mime = "application/x-tar", use = "extract" },
+	{ mime = "application/x-bzip2", use = "extract" },
+	{ mime = "application/x-7z-compressed", use = "extract" },
+	{ mime = "application/x-rar", use = "extract" },
+	{ mime = "application/vnd.rar", use = "extract" },
+	{ mime = "application/x-xz", use = "extract" },
+	{ mime = "application/gzip", use = "extract" },
+]
+
+# ============================================================
+# 任务管理
+# ============================================================
+[tasks]
+micro_workers = 10           # 微任务并发数
+macro_workers = 10           # 宏任务并发数
+bizarre_retry = 3            # 失败重试次数
+suppress_preload = false     # 显示预加载进度
+
+image_alloc = 536870912      # 图片解码内存限制 (512MB)
+image_bound = [5000, 5000]   # 图片尺寸限制 [宽, 高]
+
+# ============================================================
+# 插件系统
+# ============================================================
+[plugin]
+# Git 状态 fetchers（使用自定义插件）
+prepend_fetchers = [
+	{ id = "git-custom", name = "*", run = "git-custom" },
+	{ id = "git-custom", name = "*/", run = "git-custom" },
+]
+
+# 预览器和预加载器规则
+prepend_previewers = [
+	# 文本文件预览已禁用，使用 e 键全屏预览（带日语支持和语法高亮）
+	# { mime = "text/*", run = "nkf-code" },
+	# { mime = "application/{javascript,json,x-wine-extension-ini}", run = "nkf-code" },
+
+	# 压缩文件预览（使用 ouch）- 必须放在最前面以覆盖默认预览器
+	{ name = "*.tar.xz", run = "ouch" },
+	{ name = "*.tar.gz", run = "ouch" },
+	{ name = "*.tar.bz2", run = "ouch" },
+	{ name = "*.zip", run = "ouch" },
+	{ name = "*.7z", run = "ouch" },
+	{ name = "*.rar", run = "ouch" },
+
+	{ mime = "application/zip",             run = "ouch" },
+	{ mime = "application/x-tar",           run = "ouch" },
+	{ mime = "application/x-bzip2",         run = "ouch" },
+	{ mime = "application/x-7z-compressed", run = "ouch" },
+	{ mime = "application/x-rar",           run = "ouch" },
+	{ mime = "application/vnd.rar",         run = "ouch" },
+	{ mime = "application/x-xz",            run = "ouch" },
+]
+
+prepend_preloaders = [
+	# 自定义预加载器在这里添加
+]
+
+# ============================================================
+# 输入框设置
+# ============================================================
+[input]
+cursor_blink = false
+
+# CD 命令
+cd_title = "Change directory:"
+cd_origin = "top-center"
+cd_offset = [0, 2, 50, 3]
+
+# 创建文件
+create_title = ["Create:", "Create (dir):"]
+create_origin = "top-center"
+create_offset = [0, 2, 50, 3]
+
+# 重命名
+rename_title = "Rename:"
+rename_origin = "hovered"
+rename_offset = [0, 1, 50, 3]
+
+# 过滤
+filter_title = "Filter:"
+filter_origin = "top-center"
+filter_offset = [0, 2, 50, 3]
+
+# 查找
+find_title = ["Find next:", "Find previous:"]
+find_origin = "top-center"
+find_offset = [0, 2, 50, 3]
+
+# 搜索
+search_title = "Search via {n}:"
+search_origin = "top-center"
+search_offset = [0, 2, 50, 3]
+
+# Shell 命令
+shell_title = ["Shell:", "Shell (block):"]
+shell_origin = "top-center"
+shell_offset = [0, 2, 50, 3]
+
+# ============================================================
+# 确认对话框
+# ============================================================
+[confirm]
+# 回收站
+trash_title = "Trash {n} selected file{s}?"
+trash_origin = "center"
+trash_offset = [0, 0, 70, 20]
+
+# 永久删除
+delete_title = "Permanently delete {n} selected file{s}?"
+delete_origin = "center"
+delete_offset = [0, 0, 70, 20]
+
+# 覆盖文件
+overwrite_title = "Overwrite file?"
+overwrite_content = "Will overwrite the following file:"
+overwrite_origin = "center"
+overwrite_offset = [0, 0, 50, 15]
+
+# 退出确认
+quit_title = "Quit?"
+quit_content = "The following tasks are still running, are you sure you want to quit?"
+quit_origin = "center"
+quit_offset = [0, 0, 50, 15]
+
+# ============================================================
+# 选择器
+# ============================================================
+[pick]
+open_title = "Open with:"
+open_origin = "hovered"
+open_offset = [0, 1, 50, 7]
+
+# ============================================================
+# 快捷键提示
+# ============================================================
+[which]
+sort_by = "none"
+sort_sensitive = false
+sort_reverse = false
+sort_translit = false
