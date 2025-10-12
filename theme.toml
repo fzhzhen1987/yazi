@@ -1,0 +1,31 @@
+# Yazi 主题配置
+# 文档: https://yazi-rs.github.io/docs/configuration/theme
+
+# ============================================================
+# 说明
+# ============================================================
+# 本文件用于覆盖默认主题
+# 默认主题参考:
+# - theme-dark.toml: https://github.com/sxyazi/yazi/blob/shipped/yazi-config/preset/theme-dark.toml
+# - theme-light.toml: https://github.com/sxyazi/yazi/blob/shipped/yazi-config/preset/theme-light.toml
+#
+# Yazi 会根据终端的明暗模式自动加载对应主题
+# 本文件的配置会同时覆盖两种模式
+#
+# 如果需要更细粒度的控制，使用 [flavor] 指定不同的 flavor
+# ============================================================
+
+[flavor]
+# 为明暗模式指定不同的 flavor
+# dark = "my-dark-flavor"
+# light = "my-light-flavor"
+
+# ============================================================
+# 自定义配色（从 lf 迁移）
+# ============================================================
+
+[filetype]
+rules = [
+	# 目录使用亮蓝色（对应 LS_COLORS 的 di=01;94）
+	{ name = "*/", fg = "lightblue", bold = true },
+]
