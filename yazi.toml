@@ -69,7 +69,12 @@ play = [
 
 # 解压（使用 ouch）
 extract = [
-	{ run = 'ouch d -y "$@"', desc = "Extract here with ouch", for = "unix" },
+	{ run = 'ouch d -y "$@"', desc = "Extract here with ouch", block = true, for = "unix" },
+]
+
+# 解压 zip（使用 unzip，避免 ouch 的符号链接 bug）
+extract_zip = [
+	{ run = 'unzip -q "$1"', desc = "Extract zip with unzip", block = true, for = "unix" },
 ]
 
 # ============================================================
@@ -77,8 +82,10 @@ extract = [
 # ============================================================
 [open]
 prepend_rules = [
-	# 压缩文件使用 extract
-	{ mime = "application/zip", use = "extract" },
+	# zip 文件使用 unzip（避免 ouch 符号链接 bug）
+	{ mime = "application/zip", use = "extract_zip" },
+
+	# 其他压缩文件使用 ouch
 	{ mime = "application/x-tar", use = "extract" },
 	{ mime = "application/x-bzip2", use = "extract" },
 	{ mime = "application/x-7z-compressed", use = "extract" },
